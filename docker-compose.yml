@@ -1,0 +1,24 @@
+# Local Postgres for development and the integration suite.
+#
+# Port 5434 on purpose: 5432 and 5433 are usually already taken locally, and a test
+# suite that truncates tables should never be able to reach the wrong database.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bitespeed-identity-pg
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: identity
+    ports:
+      - '5434:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d identity']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pgdata:
